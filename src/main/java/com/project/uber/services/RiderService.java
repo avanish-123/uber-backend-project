@@ -1,0 +1,21 @@
+package com.project.uber.services;
+
+import com.project.uber.dto.DriverDTO;
+import com.project.uber.dto.RideDTO;
+import com.project.uber.dto.RideRequestDTO;
+import com.project.uber.dto.RiderDTO;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+public interface RiderService {
+    RideRequestDTO requestRide(RideRequestDTO rideRequestDTO);
+
+    RideDTO cancelRide(Long rideId);
+
+    RiderDTO rateDriver(Long rideId, Integer rating);
+
+    RiderDTO getMyProfile();
+
+    List<RideDTO> getAllMRides();
+}
