@@ -3,10 +3,7 @@ package com.project.uber.entities;
 import com.project.uber.entities.enums.PaymentMethod;
 import com.project.uber.entities.enums.RideRequestStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.locationtech.jts.geom.Point;
 
@@ -41,7 +38,7 @@ public class RideRequest {
     @Enumerated(EnumType.STRING)
     private RideRequestStatus status;
 
-
+    private double fare;
 
 
     @CreationTimestamp

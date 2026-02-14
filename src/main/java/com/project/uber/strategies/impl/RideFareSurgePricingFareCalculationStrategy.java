@@ -1,13 +1,13 @@
 package com.project.uber.strategies.impl;
 
-import com.project.uber.dto.RideRequestDTO;
+import com.project.uber.entities.RideRequest;
 import com.project.uber.strategies.RideFareCalculationStrategy;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RideFareSurgePricingFareCalculationStrategy implements RideFareCalculationStrategy {
     @Override
-    public double calculateFare(RideRequestDTO rideRequestDTO) {
+    public double calculateFare(RideRequest rideRequest) {
         return 0;
     }
 }
