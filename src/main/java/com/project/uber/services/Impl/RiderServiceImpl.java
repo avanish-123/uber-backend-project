@@ -1,9 +1,9 @@
 package com.project.uber.services.Impl;
 
-import com.project.uber.dto.DriverDTO;
 import com.project.uber.dto.RideDTO;
 import com.project.uber.dto.RideRequestDTO;
 import com.project.uber.dto.RiderDTO;
+import com.project.uber.entities.Driver;
 import com.project.uber.entities.RideRequest;
 import com.project.uber.entities.Rider;
 import com.project.uber.entities.User;
@@ -12,9 +12,8 @@ import com.project.uber.exceptions.ResourceNotFoundException;
 import com.project.uber.repositories.RideRequestRepository;
 import com.project.uber.repositories.RiderRepository;
 import com.project.uber.services.RiderService;
-import com.project.uber.strategies.DriverMatchingStrategy;
-import com.project.uber.strategies.RideFareCalculationStrategy;
 import com.project.uber.strategies.RideStrategyManager;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -32,6 +31,7 @@ public class RiderServiceImpl implements RiderService {
     private final RiderRepository riderRepository;
 
     @Override
+    @Transactional
     public RideRequestDTO requestRide(RideRequestDTO rideRequestDTO) {
         Rider rider = getCurrentRider();
         RideRequest rideRequest = modelMapper.map(rideRequestDTO, RideRequest.class);
@@ -40,7 +40,9 @@ public class RiderServiceImpl implements RiderService {
         rideRequest.setFare(fare);
         rideRequest.setRider(rider);
         RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
-        rideStrategyManager.driverMatchingStrategy(rideRequest.getRider().getRating()).findMatchingDriver(rideRequest);
+
+        List<Driver> drivers = rideStrategyManager.driverMatchingStrategy(rideRequest.getRider().getRating()).findMatchingDriver(rideRequest);
+        // TODO: send notification  to all the drivers
         return modelMapper.map(savedRideRequest, RideRequestDTO.class);
     }
 

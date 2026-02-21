@@ -1,7 +1,5 @@
 package com.project.uber.advices;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;

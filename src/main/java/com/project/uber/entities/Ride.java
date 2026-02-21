@@ -35,8 +35,10 @@ public class Ride {
     private Driver driver;
 
     @Enumerated(EnumType.STRING)
+
     private PaymentMethod paymentMethod;
 
+    @Enumerated(EnumType.STRING)
     private RideStatus rideStatus;
 
     private String otp;
