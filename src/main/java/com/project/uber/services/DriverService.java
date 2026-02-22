@@ -4,6 +4,8 @@ import com.project.uber.dto.DriverDTO;
 import com.project.uber.dto.RideDTO;
 import com.project.uber.dto.RiderDTO;
 import com.project.uber.entities.Driver;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -22,7 +24,7 @@ public interface DriverService {
 
     DriverDTO getMyProfile();
 
-    List<RideDTO> getAllMRides();
+    Page<RideDTO> getAllMRides(PageRequest pageRequest);
 
     Driver getCurrentDriver();
 }

@@ -16,6 +16,9 @@ import com.project.uber.services.RideService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -51,7 +54,18 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RideDTO cancelRide(Long rideId) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Driver driver = getCurrentDriver();
+        if(!ride.getDriver().equals(driver)){
+            throw new RuntimeException("You are not the assigned driver of the ride");
+        }
+        if(!ride.getRideStatus().equals(RideStatus.CONFIRMED)){
+            throw new RuntimeException("Ride can not be canceled");
+        }
+        rideService.updateRideStatus(ride, RideStatus.CANCELLED);
+        driver.setAvailable(true);
+        driverRepository.save(driver);
+        return modelMapper.map(ride, RideDTO.class);
     }
 
     @Override
@@ -84,12 +98,16 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public DriverDTO getMyProfile() {
-        return null;
+        Driver driver = driverRepository.findById(2L).orElseThrow(() -> new ResourceNotFoundException("Driver not found"));
+        return modelMapper.map(driver, DriverDTO.class);
     }
 
     @Override
-    public List<RideDTO> getAllMRides() {
-        return List.of();
+    public Page<RideDTO> getAllMRides(PageRequest pageRequest) {
+        Driver driver = getCurrentDriver();
+        return rideService.getAllRidersOfDriver(driver.getId(), pageRequest).map(
+                ride -> modelMapper.map(ride, RideDTO.class)
+        );
     }
 
     @Override
