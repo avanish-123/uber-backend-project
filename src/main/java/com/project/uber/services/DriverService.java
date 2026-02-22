@@ -7,8 +7,6 @@ import com.project.uber.entities.Driver;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.List;
-
 
 public interface DriverService {
 
@@ -27,4 +25,8 @@ public interface DriverService {
     Page<RideDTO> getAllMRides(PageRequest pageRequest);
 
     Driver getCurrentDriver();
+
+    Driver update(Driver driver);
+
+    Driver updateDriverAvailability(Driver driver, boolean availability);
 }

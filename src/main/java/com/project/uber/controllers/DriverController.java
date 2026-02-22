@@ -3,7 +3,6 @@ package com.project.uber.controllers;
 import com.project.uber.dto.DriverDTO;
 import com.project.uber.dto.RideDTO;
 import com.project.uber.dto.RideStartDTO;
-import com.project.uber.entities.Driver;
 import com.project.uber.services.DriverService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
