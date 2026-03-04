@@ -1,8 +1,5 @@
 package com.project.uber.services.Impl;
 
-import com.project.uber.dto.RideDTO;
-import com.project.uber.dto.WalletDTO;
-import com.project.uber.dto.WalletTransactionDTO;
 import com.project.uber.entities.Ride;
 import com.project.uber.entities.User;
 import com.project.uber.entities.Wallet;

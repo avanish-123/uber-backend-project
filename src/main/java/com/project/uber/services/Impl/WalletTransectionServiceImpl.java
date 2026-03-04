@@ -1,6 +1,5 @@
 package com.project.uber.services.Impl;
 
-import com.project.uber.dto.WalletTransactionDTO;
 import com.project.uber.entities.WalletTransaction;
 import com.project.uber.repositories.WalletTransectionRepository;
 import com.project.uber.services.WalletTransectionService;
