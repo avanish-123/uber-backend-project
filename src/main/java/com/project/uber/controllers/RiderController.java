@@ -1,11 +1,12 @@
 package com.project.uber.controllers;
 
-import com.project.uber.dto.RideDTO;
-import com.project.uber.dto.RideRequestDTO;
-import com.project.uber.dto.RiderDTO;
+import com.project.uber.dto.*;
 import com.project.uber.services.RiderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +27,19 @@ public class RiderController {
         return ResponseEntity.ok(riderService.cancelRide(rideId));
     }
 
+    @PostMapping("/rateDriver")
+    public ResponseEntity<DriverDTO> rateDriver(@RequestBody RatingDTO rating){
+        return ResponseEntity.ok(riderService.rateDriver(rating.getRideId(), rating.getRating()));
+    }
+
     @GetMapping("/getProfile")
     public ResponseEntity<RiderDTO> getMyProfile(){
         return ResponseEntity.ok(riderService.getMyProfile());
+    }
+
+    @GetMapping("/getMyRides")
+    public ResponseEntity<Page<RideDTO>> getAllMyRides(@RequestParam(defaultValue = "0") Integer pageOffset, @RequestParam(defaultValue = "10", required = false) Integer pageSize){
+        PageRequest pageRequest = PageRequest.of(pageOffset, pageSize, Sort.by(Sort.Direction.DESC, "createdTime", "id"));
+        return ResponseEntity.ok(riderService.getAllMRides(pageRequest));
     }
 }

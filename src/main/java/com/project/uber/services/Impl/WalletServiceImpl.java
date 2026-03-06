@@ -35,7 +35,7 @@ public class WalletServiceImpl implements WalletService {
                 .transectionMethod(transectionMethod)
                 .amount(amount)
                 .build();
-        wallet.getTransactions().add(walletTransaction);
+        walletTransectionService.createNewWalletTransection(walletTransaction);
         return walletRepository.save(wallet);
     }
 
