@@ -10,10 +10,7 @@ import com.project.uber.entities.enums.RideRequestStatus;
 import com.project.uber.entities.enums.RideStatus;
 import com.project.uber.exceptions.ResourceNotFoundException;
 import com.project.uber.repositories.DriverRepository;
-import com.project.uber.services.DriverService;
-import com.project.uber.services.PaymentService;
-import com.project.uber.services.RideRequestService;
-import com.project.uber.services.RideService;
+import com.project.uber.services.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -31,6 +28,9 @@ public class DriverServiceImpl implements DriverService {
     private final RideService rideService;
     private final ModelMapper modelMapper;
     private final PaymentService paymentService;
+    private final RatingService ratingService;
+
+
     @Override
     @Transactional
     public RideDTO acceptRide(Long rideRequestId) {
@@ -81,6 +81,7 @@ public class DriverServiceImpl implements DriverService {
         Ride savedRide = rideService.updateRideStatus(ride, RideStatus.ONGOING);
 
         paymentService.createNewPayment(ride);
+        ratingService.createNewRating(ride);
 
         return modelMapper.map(savedRide, RideDTO.class);
     }
@@ -106,7 +107,15 @@ public class DriverServiceImpl implements DriverService {
 
     @Override
     public RiderDTO rateRider(Long rideId, Integer rating) {
-        return null;
+        Ride ride = rideService.getRideById(rideId);
+        Driver currentDriver = getCurrentDriver();
+        if(!currentDriver.equals(ride.getDriver())){
+            throw new RuntimeException("You are not the driver of this ride");
+        }
+        if(!ride.getRideStatus().equals(RideStatus.ENDED)){
+            throw new RuntimeException("Ride is not ended yet");
+        }
+        return ratingService.rateRider(ride, rating);
     }
 
     @Override
