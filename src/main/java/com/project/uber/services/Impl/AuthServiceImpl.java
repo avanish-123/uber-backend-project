@@ -9,13 +9,15 @@ import com.project.uber.entities.enums.Role;
 import com.project.uber.exceptions.ResourceNotFoundException;
 import com.project.uber.exceptions.RuntimeConflictException;
 import com.project.uber.repositories.UserRepository;
-import com.project.uber.services.AuthService;
-import com.project.uber.services.DriverService;
-import com.project.uber.services.RiderService;
-import com.project.uber.services.WalletService;
+import com.project.uber.security.JWTService;
+import com.project.uber.services.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -28,12 +30,24 @@ public class AuthServiceImpl implements AuthService {
     private final RiderService riderService;
     private final WalletService walletService;
     private final DriverService driverService;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JWTService jwtService;
+    private final UserService userService;
 
 
 
     @Override
-    public String login(String email, String password) {
-        return "";
+    public String[] login(String email, String password) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password)
+        );
+        User user = (User) authentication.getPrincipal();
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return new String[]{accessToken, refreshToken};
     }
 
     @Override
@@ -47,11 +61,12 @@ public class AuthServiceImpl implements AuthService {
         }
         User mappedUser = modelMapper.map(signupDTO, User.class);
         mappedUser.setRoles(Set.of(Role.RIDER));
+        mappedUser.setPassword(passwordEncoder.encode(mappedUser.getPassword()));
         User savedUser = userRepository.save(mappedUser);
         // create user related entities
         // rider
         riderService.createNewRider(savedUser);
-
+        // wallet
         walletService.createNewWallet(savedUser);
         return modelMapper.map(savedUser, UserDTO.class);
     }
@@ -73,5 +88,13 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
         Driver savedDriver = driverService.createNewDriver(driver);
         return modelMapper.map(savedDriver, DriverDTO.class);
+    }
+
+    @Override
+    public String refreshToken(String refreshToken) {
+        Long userId = jwtService.getUserIdFromToken(refreshToken);
+        User user = userService.getUserById(userId);
+
+        return jwtService.generateAccessToken(user);
     }
 }
