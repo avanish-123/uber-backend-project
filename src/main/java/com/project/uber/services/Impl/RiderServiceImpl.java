@@ -10,10 +10,7 @@ import com.project.uber.entities.enums.RideStatus;
 import com.project.uber.exceptions.ResourceNotFoundException;
 import com.project.uber.repositories.RideRequestRepository;
 import com.project.uber.repositories.RiderRepository;
-import com.project.uber.services.DriverService;
-import com.project.uber.services.RatingService;
-import com.project.uber.services.RideService;
-import com.project.uber.services.RiderService;
+import com.project.uber.services.*;
 import com.project.uber.strategies.RideStrategyManager;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +34,7 @@ public class RiderServiceImpl implements RiderService {
     private final RideService rideService;
     private final DriverService driverService;
     private final RatingService ratingService;
+    private final EmailSenderService emailSenderService;
 
     @Override
     @Transactional
@@ -50,7 +48,10 @@ public class RiderServiceImpl implements RiderService {
         RideRequest savedRideRequest = rideRequestRepository.save(rideRequest);
 
         List<Driver> drivers = rideStrategyManager.driverMatchingStrategy(rideRequest.getRider().getRating()).findMatchingDriver(rideRequest);
-        // TODO: send notification  to all the drivers
+        String[] driversMail = drivers.stream()
+                .map(driver -> driver.getUser().getEmail())
+                .toArray(String[]::new);
+        emailSenderService.sendEmail((driversMail), "New ride Request", "New ride available for your nearest location");
         return modelMapper.map(savedRideRequest, RideRequestDTO.class);
     }
 
